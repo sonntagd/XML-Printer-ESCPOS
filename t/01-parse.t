@@ -41,6 +41,7 @@ subtest 'Simple parsing' => sub {
               <color>
                 <bold>This is printed with the second color (if supported)</bold>
               </color>
+              <text> with whitespaces </text>
             </escpos>
         #
     );
@@ -73,6 +74,7 @@ subtest 'Simple parsing' => sub {
         [ text         => 'This is printed with the second color (if supported)' ],
         [ bold         => 0 ],
         [ color        => 0 ],
+        [ text         => ' with whitespaces ' ],
         ],
         'XML translated correctly';
 };

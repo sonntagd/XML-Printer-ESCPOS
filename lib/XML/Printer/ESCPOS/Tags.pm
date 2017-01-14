@@ -55,7 +55,7 @@ sub parse {
         my $tag  = shift @elements;
         my $data = shift @elements;
         return $self->{caller}->_set_error_message("tag $tag is not allowed") if not $self->tag_allowed($tag);
-        my $method = '_' . ( $tag || 'text' );
+        my $method = '_' . $tag;
         $self->$method($data) or return;
     }
     return 1;
@@ -71,6 +71,7 @@ sub tag_allowed {
     my ( $self, $method ) = @_;
     return !!grep { $method eq $_ } qw/
         0
+        text
         bold
         underline
         qr
@@ -82,6 +83,20 @@ sub tag_allowed {
         /;
 }
 
+=head2 _0
+
+Prints plain text and strips out leading and trailing whitespaces.
+
+=cut
+
+sub _0 {
+    my ( $self, $text ) = @_;
+    $text =~ s/^\s+//gm;
+    $text =~ s/\s+$//gm;
+    $self->{printer}->text($text) if $text =~ /\S/;
+    return 1;
+}
+
 =head2 _text
 
 Prints plain text.
@@ -89,10 +104,11 @@ Prints plain text.
 =cut
 
 sub _text {
-    my ( $self, $text ) = @_;
-    $text =~ s/^\s+//gm;
-    $text =~ s/\s+$//gm;
-    $self->{printer}->text($text) if $text =~ /\S/;
+    my ( $self, $params ) = @_;
+    return $self->{caller}->_set_error_message("wrong text tag usage") if @$params != 3;
+    return $self->{caller}->_set_error_message("wrong text tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong text tag usage") if $params->[1] != 0;
+    $self->{printer}->text($params->[2]);
     return 1;
 }
 

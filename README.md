@@ -33,6 +33,7 @@ This module provides a markup language that describes what your ESCPOS printer s
 
 ## HOW TO WRITE ESCPOS XML FILES
 
+The XML file should be enclosed in `<escpos>` ... `</escpos>` tags.
 
 
 ## INSTALLATION
