@@ -78,6 +78,7 @@ sub tag_allowed {
         lf
         doubleStrike
         invert
+        color
         /;
 }
 
@@ -137,6 +138,17 @@ Sets text to be printed underlined.
 sub _underline {
     my $self = shift;
     return $self->simple_switch( 'underline', @_ );
+}
+
+=head2 _color
+
+Use this tag to use the second color (if support by your printer).
+
+=cut
+
+sub _color {
+    my $self = shift;
+    return $self->simple_switch( 'color', @_ );
 }
 
 =head2 _qr

@@ -38,6 +38,9 @@ subtest 'Simple parsing' => sub {
                 <underline>bold AND <bold> underlinded</bold> text</underline>
                 <doubleStrike>you <invert>can not</invert> read this</doubleStrike>
               </bold>
+              <color>
+                <bold>This is printed with the second color (if supported)</bold>
+              </color>
             </escpos>
         #
     );
@@ -65,6 +68,11 @@ subtest 'Simple parsing' => sub {
         [ text         => 'read this' ],
         [ doubleStrike => 0 ],
         [ bold         => 0 ],
+        [ color        => 1 ],
+        [ bold         => 1 ],
+        [ text         => 'This is printed with the second color (if supported)' ],
+        [ bold         => 0 ],
+        [ color        => 0 ],
         ],
         'XML translated correctly';
 };
