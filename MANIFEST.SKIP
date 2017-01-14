@@ -1,0 +1,6 @@
+.gitignore
+.git/*
+Dockerfile
+.travis.yml
+xt/boilerplate.t
+MANIFEST.SKIP
