@@ -73,6 +73,7 @@ sub tag_allowed {
         bold
         underline
         qr
+        utf8ImagedText
         /;
 }
 
@@ -132,6 +133,26 @@ sub _qr {
     }
     else {
         $self->{printer}->qr( $params->[2] );
+    }
+}
+
+=head2 _utf8ImagedText
+
+Can print text with special styling.
+
+=cut
+
+sub _utf8ImagedText {
+    my ( $self, $params ) = @_;
+    return $self->{caller}->_set_error_message("Wrong utf8ImagedText tag usage") if @$params != 3;
+    return $self->{caller}->_set_error_message("Wrong utf8ImagedText tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("Wrong utf8ImagedText tag usage") if $params->[1] != 0;
+    my $options = $params->[0];
+    if (%$options) {
+        $self->{printer}->utf8ImagedText( $params->[2], map { $_ => $options->{$_} } sort keys %$options );
+    }
+    else {
+        $self->{printer}->utf8ImagedText( $params->[2] );
     }
 }
 

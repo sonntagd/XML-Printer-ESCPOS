@@ -23,7 +23,6 @@ use XML::Printer::ESCPOS;
     }
 }
 
-
 subtest 'Simple parsing' => sub {
     plan tests => 3;
 
@@ -109,9 +108,73 @@ subtest 'QR codes' => sub {
     );
     ok $ret => 'parsing successful';
     is $parser->errormessage(), undef, 'errormessage is empty';
-    is_deeply $mockprinter->{calls}, [
-        [ qr => 'Dont panic!', 'L', 4, 4 ],
-    ], 'XML translated correctly';
+    is_deeply $mockprinter->{calls}, [ [ qr => 'Dont panic!', 'L', 4, 4 ], ], 'XML translated correctly';
+};
+
+subtest 'utf8ImagedText' => sub {
+    plan tests => 9;
+
+    my $mockprinter = MockPrinter->new();
+    my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    my $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText>advanced TeXT</utf8ImagedText>
+        </escpos>
+    #
+    );
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+    is_deeply $mockprinter->{calls}, [ [ utf8ImagedText => 'advanced TeXT' ], ], 'XML translated correctly';
+
+    $mockprinter = MockPrinter->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText
+                fontFamily="Rubik"
+            >Dont panic!</utf8ImagedText>
+        </escpos>
+    #
+    );
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+    is_deeply $mockprinter->{calls},
+        [
+        [   utf8ImagedText => "Dont panic!",
+            fontFamily     => "Rubik",
+        ],
+        ],
+        'XML translated correctly';
+
+    $mockprinter = MockPrinter->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText
+                fontFamily="Rubik"
+                fontStyle = "Normal"
+                lineHeight ="40"
+            >Dont panic!</utf8ImagedText>
+        </escpos>
+    #
+    );
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+    is_deeply $mockprinter->{calls},
+        [
+        [   utf8ImagedText => "Dont panic!",
+            fontFamily     => "Rubik",
+            fontStyle      => "Normal",
+            lineHeight     => 40,
+        ],
+        ],
+        'XML translated correctly';
 };
 
 done_testing();
