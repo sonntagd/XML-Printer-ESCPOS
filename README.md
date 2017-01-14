@@ -1,0 +1,59 @@
+# XML::Printer::ESCPOS
+
+[![Build Status](https://travis-ci.org/sonntagd/XML-Printer-ESCPOS.svg?branch=master)](https://travis-ci.org/sonntagd/XML-Printer-ESCPOS)
+
+
+## DESCRIPTION
+
+This module provides a markup language that describes what your ESCPOS printer should do. It works on top of the great and easy to use [Printer::ESCPOS](https://metacpan.org/pod/Printer::ESCPOS). Now you can save your printer output in an XML file and you can write templates to be processed by Template Toolkit or the template engine of your choice.
+
+## SYNOPSIS
+
+```perl
+    use Printer::ESCPOS;
+    use XML::Printer::ESCPOS;
+
+    # connect to your printer, see Printer::ESCPOS for more examples
+    my $printer_id = '192.168.0.10';
+    my $port       = '9100';
+    my $device = Printer::ESCPOS->new(
+        driverType => 'Network',
+        deviceIp   => $printer_ip,
+        devicePort => $port,
+    );
+
+    my $parser = XML::Printer::ESCPOS->new(printer => $device->printer);
+    $parser->parse(q#
+    <escpos>
+        <bold>bold text</bold>
+        <underline>underlined text</underline>
+    </escpos>
+    #) or die "Error parsing ESCPOS XML file: ".$parser->errormessage;
+```
+
+## HOW TO WRITE ESCPOS XML FILES
+
+
+
+## INSTALLATION
+
+To install this module, use `cpanm`:
+
+```bash
+cpanm XML::Printer::ESCPOS
+```
+
+## SUPPORT AND BUGS
+
+Please report any bugs or feature requests by opening an issue on Github:
+L<https://github.com/sonntagd/XML-Printer-ESCPOS/issues>
+
+## LICENSE AND COPYRIGHT
+
+Copyright (C) 2017 Dominic Sonntag.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+http://www.perlfoundation.org/artistic_license_2_0
