@@ -45,7 +45,7 @@ cpanm XML::Printer::ESCPOS
 
 ## SUPPORT AND BUGS
 
-Please report any bugs or feature requests by opening an [issue on Github](https://github.com/sonntagd/XML-Printer-ESCPOS/issues)
+Please report any bugs or feature requests by opening an [issue on Github](https://github.com/sonntagd/XML-Printer-ESCPOS/issues).
 
 ## LICENSE AND COPYRIGHT
 
