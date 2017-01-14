@@ -52,9 +52,9 @@ subtest 'Simple parsing' => sub {
         [ underline => 0 ],
         [ bold      => 1 ],
         [ underline => 1 ],
-        [ text      => 'bold AND ' ],
-        [ text      => ' underlinded' ],
-        [ text      => ' text' ],
+        [ text      => 'bold AND' ],
+        [ text      => 'underlinded' ],
+        [ text      => 'text' ],
         [ underline => 0 ],
         [ bold      => 0 ],
         ],
@@ -175,6 +175,39 @@ subtest 'utf8ImagedText' => sub {
         ],
         ],
         'XML translated correctly';
+};
+
+subtest 'linefeed' => sub {
+    #plan tests => 6;
+
+    my $mockprinter = MockPrinter->new();
+    my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    my $ret = $parser->parse(
+        q#
+            <escpos>
+              <bold>bold<lf /> text</bold>
+            </escpos>
+        #
+    );
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+    is_deeply $mockprinter->{calls},
+        [ [ bold => 1 ], [ text => "bold" ], [ lf => ], [ text => "text" ], [ bold => 0 ], ],
+        'XML translated correctly';
+
+    $mockprinter = MockPrinter->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+            <escpos>
+              <bold>bold<lf>error</lf> text</bold>
+            </escpos>
+        #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong lf tag usage', 'correct error message';
 };
 
 done_testing();

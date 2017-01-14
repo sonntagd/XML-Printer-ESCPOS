@@ -30,10 +30,11 @@ sub simple_switch {
     $self->{states}->{$method}++;
     $self->{printer}->$method(1) if $self->{states}->{$method} == 1;
 
-    $self->parse($tags);
+    $self->parse($tags) or return;
 
     $self->{printer}->$method(0) if $self->{states}->{$method} == 1;
     $self->{states}->{$method}--;
+    return 1;
 }
 
 =head2 parse( $element )
@@ -55,7 +56,7 @@ sub parse {
         my $data = shift @elements;
         return $self->{caller}->_set_error_message("tag $tag is not allowed") if not $self->tag_allowed($tag);
         my $method = '_' . ( $tag || 'text' );
-        $self->$method($data);
+        $self->$method($data) or return;
     }
     return 1;
 }
@@ -74,6 +75,7 @@ sub tag_allowed {
         underline
         qr
         utf8ImagedText
+        lf
         /;
 }
 
@@ -85,7 +87,10 @@ Prints plain text.
 
 sub _text {
     my ( $self, $text ) = @_;
+    $text =~ s/^\s+//gm;
+    $text =~ s/\s+$//gm;
     $self->{printer}->text($text) if $text =~ /\S/;
+    return 1;
 }
 
 =head2 _bold
@@ -96,7 +101,7 @@ Sets text to be printed bold.
 
 sub _bold {
     my $self = shift;
-    $self->simple_switch( 'bold', @_ );
+    return $self->simple_switch( 'bold', @_ );
 }
 
 =head2 _underline
@@ -107,7 +112,7 @@ Sets text to be printed underlined.
 
 sub _underline {
     my $self = shift;
-    $self->simple_switch( 'underline', @_ );
+    return $self->simple_switch( 'underline', @_ );
 }
 
 =head2 _qr
@@ -124,9 +129,9 @@ Prints a QR code. Possible attributes:
 
 sub _qr {
     my ( $self, $params ) = @_;
-    return $self->{caller}->_set_error_message("Wrong QR code tag usage") if @$params != 3;
-    return $self->{caller}->_set_error_message("Wrong QR code tag usage") if ref $params->[0] ne 'HASH';
-    return $self->{caller}->_set_error_message("Wrong QR code tag usage") if $params->[1] != 0;
+    return $self->{caller}->_set_error_message("wrong QR code tag usage") if @$params != 3;
+    return $self->{caller}->_set_error_message("wrong QR code tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong QR code tag usage") if $params->[1] != 0;
     my $options = $params->[0];
     if (%$options) {
         $self->{printer}->qr( $params->[2], $options->{ecc} || 'L', $options->{version} || 5, $options->{moduleSize} || 3 );
@@ -134,6 +139,7 @@ sub _qr {
     else {
         $self->{printer}->qr( $params->[2] );
     }
+    return 1;
 }
 
 =head2 _utf8ImagedText
@@ -144,9 +150,9 @@ Can print text with special styling.
 
 sub _utf8ImagedText {
     my ( $self, $params ) = @_;
-    return $self->{caller}->_set_error_message("Wrong utf8ImagedText tag usage") if @$params != 3;
-    return $self->{caller}->_set_error_message("Wrong utf8ImagedText tag usage") if ref $params->[0] ne 'HASH';
-    return $self->{caller}->_set_error_message("Wrong utf8ImagedText tag usage") if $params->[1] != 0;
+    return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if @$params != 3;
+    return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if $params->[1] != 0;
     my $options = $params->[0];
     if (%$options) {
         $self->{printer}->utf8ImagedText( $params->[2], map { $_ => $options->{$_} } sort keys %$options );
@@ -154,6 +160,22 @@ sub _utf8ImagedText {
     else {
         $self->{printer}->utf8ImagedText( $params->[2] );
     }
+    return 1;
+}
+
+=head2 _lf
+
+Moves to the next line.
+
+=cut
+
+sub _lf {
+    my ( $self, $params ) = @_;
+    return $self->{caller}->_set_error_message("wrong lf tag usage") if @$params != 1;
+    return $self->{caller}->_set_error_message("wrong lf tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong lf tag usage") if %{ $params->[0] };
+    $self->{printer}->lf();
+    return 1;
 }
 
 1;

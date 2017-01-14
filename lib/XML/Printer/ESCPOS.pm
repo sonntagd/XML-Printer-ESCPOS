@@ -80,6 +80,7 @@ sub parse {
         printer => $self->{printer},
         caller  => $self,
     );
+
     return $tags->parse( $tree->[1] );
 }
 
