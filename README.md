@@ -1,6 +1,6 @@
 # XML::Printer::ESCPOS
 
-[![Build Status](https://travis-ci.org/sonntagd/XML-Printer-ESCPOS.svg?branch=master)](https://travis-ci.org/sonntagd/XML-Printer-ESCPOS)
+[![Build Status](https://travis-ci.org/sonntagd/XML-Printer-ESCPOS.svg?branch=master)](https://travis-ci.org/sonntagd/XML-Printer-ESCPOS) [![Coverage Status](https://coveralls.io/repos/github/sonntagd/XML-Printer-ESCPOS/badge.svg?branch=master)](https://coveralls.io/github/sonntagd/XML-Printer-ESCPOS?branch=master)
 
 
 ## DESCRIPTION
