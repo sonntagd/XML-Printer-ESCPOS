@@ -36,6 +36,7 @@ subtest 'Simple parsing' => sub {
               <underline>underlined text</underline>
               <bold>
                 <underline>bold AND <bold> underlinded</bold> text</underline>
+                <doubleStrike>you <invert>can not</invert> read this</doubleStrike>
               </bold>
             </escpos>
         #
@@ -44,19 +45,26 @@ subtest 'Simple parsing' => sub {
     is $parser->errormessage(), undef, 'errormessage is empty';
     is_deeply $mockprinter->{calls},
         [
-        [ bold      => 1 ],
-        [ text      => 'bold text' ],
-        [ bold      => 0 ],
-        [ underline => 1 ],
-        [ text      => 'underlined text' ],
-        [ underline => 0 ],
-        [ bold      => 1 ],
-        [ underline => 1 ],
-        [ text      => 'bold AND' ],
-        [ text      => 'underlinded' ],
-        [ text      => 'text' ],
-        [ underline => 0 ],
-        [ bold      => 0 ],
+        [ bold         => 1 ],
+        [ text         => 'bold text' ],
+        [ bold         => 0 ],
+        [ underline    => 1 ],
+        [ text         => 'underlined text' ],
+        [ underline    => 0 ],
+        [ bold         => 1 ],
+        [ underline    => 1 ],
+        [ text         => 'bold AND' ],
+        [ text         => 'underlinded' ],
+        [ text         => 'text' ],
+        [ underline    => 0 ],
+        [ doubleStrike => 1 ],
+        [ text         => 'you' ],
+        [ invert       => 1 ],
+        [ text         => 'can not' ],
+        [ invert       => 0 ],
+        [ text         => 'read this' ],
+        [ doubleStrike => 0 ],
+        [ bold         => 0 ],
         ],
         'XML translated correctly';
 };
@@ -178,6 +186,7 @@ subtest 'utf8ImagedText' => sub {
 };
 
 subtest 'linefeed' => sub {
+
     #plan tests => 6;
 
     my $mockprinter = MockPrinter->new();

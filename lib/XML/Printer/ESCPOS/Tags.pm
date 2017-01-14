@@ -76,6 +76,8 @@ sub tag_allowed {
         qr
         utf8ImagedText
         lf
+        doubleStrike
+        invert
         /;
 }
 
@@ -102,6 +104,28 @@ Sets text to be printed bold.
 sub _bold {
     my $self = shift;
     return $self->simple_switch( 'bold', @_ );
+}
+
+=head2 _doubleStrike
+
+Sets text to be printed double striked.
+
+=cut
+
+sub _doubleStrike {
+    my $self = shift;
+    return $self->simple_switch( 'doubleStrike', @_ );
+}
+
+=head2 _invert
+
+Sets text to be printed inverted.
+
+=cut
+
+sub _invert {
+    my $self = shift;
+    return $self->simple_switch( 'invert', @_ );
 }
 
 =head2 _underline
