@@ -8,8 +8,6 @@ perl:
   - "5.10"
 os:
   - linux
-#  - osx
-  - windows
 
 script:
   perl Makefile.PL && make test RELEASE_TESTING=1 
