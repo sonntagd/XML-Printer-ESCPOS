@@ -7,18 +7,18 @@ use XML::Printer::ESCPOS;
 
 {
 
-    package MockPrinter;
+    package Mock::Printer::ESCPOS;
 
     our $AUTOLOAD;
 
     sub new {
-        return bless { calls => [], }, 'MockPrinter';
+        return bless { calls => [], }, 'Mock::Printer::ESCPOS';
     }
 
     sub AUTOLOAD {
         my ( $self, @params ) = @_;
         my $method = $AUTOLOAD;
-        $method =~ s/^.*?:://;
+        $method =~ s/^.*:://;
         push @{ $self->{calls} } => [ $method => @params ];
     }
 }
@@ -26,7 +26,7 @@ use XML::Printer::ESCPOS;
 subtest 'Simple parsing' => sub {
     plan tests => 3;
 
-    my $mockprinter = MockPrinter->new();
+    my $mockprinter = Mock::Printer::ESCPOS->new();
     my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
 
     my $ret = $parser->parse(
@@ -80,7 +80,7 @@ subtest 'Simple parsing' => sub {
 subtest 'undefined tags' => sub {
     plan tests => 2;
 
-    my $mockprinter = MockPrinter->new();
+    my $mockprinter = Mock::Printer::ESCPOS->new();
     my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
 
     my $ret = $parser->parse(
@@ -98,7 +98,7 @@ subtest 'undefined tags' => sub {
 subtest 'QR codes' => sub {
     plan tests => 6;
 
-    my $mockprinter = MockPrinter->new();
+    my $mockprinter = Mock::Printer::ESCPOS->new();
     my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
 
     my $ret = $parser->parse(
@@ -112,7 +112,7 @@ subtest 'QR codes' => sub {
     is $parser->errormessage(), undef, 'errormessage is empty';
     is_deeply $mockprinter->{calls}, [ [ qr => 'Simple QR code' ], ], 'XML translated correctly';
 
-    $mockprinter = MockPrinter->new();
+    $mockprinter = Mock::Printer::ESCPOS->new();
     $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
 
     $ret = $parser->parse(
@@ -130,7 +130,7 @@ subtest 'QR codes' => sub {
 subtest 'utf8ImagedText' => sub {
     plan tests => 9;
 
-    my $mockprinter = MockPrinter->new();
+    my $mockprinter = Mock::Printer::ESCPOS->new();
     my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
 
     my $ret = $parser->parse(
@@ -144,7 +144,7 @@ subtest 'utf8ImagedText' => sub {
     is $parser->errormessage(), undef, 'errormessage is empty';
     is_deeply $mockprinter->{calls}, [ [ utf8ImagedText => 'advanced TeXT' ], ], 'XML translated correctly';
 
-    $mockprinter = MockPrinter->new();
+    $mockprinter = Mock::Printer::ESCPOS->new();
     $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
 
     $ret = $parser->parse(
@@ -166,7 +166,7 @@ subtest 'utf8ImagedText' => sub {
         ],
         'XML translated correctly';
 
-    $mockprinter = MockPrinter->new();
+    $mockprinter = Mock::Printer::ESCPOS->new();
     $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
 
     $ret = $parser->parse(
@@ -197,7 +197,7 @@ subtest 'linefeed' => sub {
 
     #plan tests => 6;
 
-    my $mockprinter = MockPrinter->new();
+    my $mockprinter = Mock::Printer::ESCPOS->new();
     my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
 
     my $ret = $parser->parse(
@@ -213,7 +213,7 @@ subtest 'linefeed' => sub {
         [ [ bold => 1 ], [ text => "bold" ], [ lf => ], [ text => "text" ], [ bold => 0 ], ],
         'XML translated correctly';
 
-    $mockprinter = MockPrinter->new();
+    $mockprinter = Mock::Printer::ESCPOS->new();
     $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
 
     $ret = $parser->parse(
