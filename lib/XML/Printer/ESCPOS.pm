@@ -119,7 +119,7 @@ sub _set_error_message {
 
 Sometimes it helps to see what the module would do instead of doing it. That's why I added the debug mode:
 If you do not set a printer object when calling the constructor, an L<XML::Printer::ESCPOS::Debug> object is created.
-It catches all method calls and the parse method returns the perl code that would have been executed if 
+It catches all method calls and the C<parse> method returns the perl code that would have been executed if
 you had set the printer object.
 
 This XML code

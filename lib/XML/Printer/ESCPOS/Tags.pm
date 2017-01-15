@@ -432,6 +432,22 @@ Sets the left margin for printing.
 
 sub _leftMargin {}
 
+=head2 _printNVImage
+
+Prints bit image stored in non-volatile (NV) memory of the printer.
+
+=cut
+
+sub _printNVImage {}
+
+=head2 _printImage
+
+Prints bit image stored in volatile memory of the printer.
+
+=cut
+
+sub _printImage {}
+
 
 
 1;
