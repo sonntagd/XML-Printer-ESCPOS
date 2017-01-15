@@ -1,4 +1,4 @@
-# TODO - XML::Printer::ESCPOS
+# Improvement ideas for XML::Printer::ESCPOS
 
 This document tries to summarize what needs to be done to make `XML::Printer::ESCPOS` a module that is easy to use.
 
