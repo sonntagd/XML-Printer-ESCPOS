@@ -18,23 +18,28 @@ sub new {
     return bless {%options}, $class;
 }
 
-=head2 simple_switch
+=head2 tag_allowed
 
-Helper method for simple 0/1 switches.
+Returns true if the given tag is defined.
 
 =cut
 
-sub simple_switch {
-    my ( $self, $method, $tags ) = @_;
-    $self->{states}->{$method} //= 0;
-    $self->{states}->{$method}++;
-    $self->{printer}->$method(1) if $self->{states}->{$method} == 1;
-
-    $self->parse($tags) or return;
-
-    $self->{printer}->$method(0) if $self->{states}->{$method} == 1;
-    $self->{states}->{$method}--;
-    return 1;
+sub tag_allowed {
+    my ( $self, $method ) = @_;
+    return !!grep { $method eq $_ } qw/
+        0
+        text
+        bold
+        underline
+        qr
+        utf8ImagedText
+        lf
+        doubleStrike
+        invert
+        color
+        image
+        printAreaWidth
+        /;
 }
 
 =head2 parse( $element )
@@ -61,27 +66,23 @@ sub parse {
     return 1;
 }
 
-=head2 tag_allowed
+=head2 simple_switch
 
-Returns true if the given tag is defined.
+Helper method for simple 0/1 switches.
 
 =cut
 
-sub tag_allowed {
-    my ( $self, $method ) = @_;
-    return !!grep { $method eq $_ } qw/
-        0
-        text
-        bold
-        underline
-        qr
-        utf8ImagedText
-        lf
-        doubleStrike
-        invert
-        color
-        image
-        /;
+sub simple_switch {
+    my ( $self, $method, $tags ) = @_;
+    $self->{states}->{$method} //= 0;
+    $self->{states}->{$method}++;
+    $self->{printer}->$method(1) if $self->{states}->{$method} == 1;
+
+    $self->parse($tags) or return;
+
+    $self->{printer}->$method(0) if $self->{states}->{$method} == 1;
+    $self->{states}->{$method}--;
+    return 1;
 }
 
 =head2 _0
@@ -109,7 +110,7 @@ sub _text {
     return $self->{caller}->_set_error_message("wrong text tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong text tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong text tag usage") if $params->[1] != 0;
-    $self->{printer}->text($params->[2]);
+    $self->{printer}->text( $params->[2] );
     return 1;
 }
 
@@ -241,11 +242,11 @@ sub _image {
     my ( $self, $params ) = @_;
 
     # single tag form <image filename="image.jpg" />
-    if (@$params == 1) {
+    if ( @$params == 1 ) {
         return $self->{caller}->_set_error_message("wrong image tag usage") if ref $params->[0] ne 'HASH';
         return $self->{caller}->_set_error_message("wrong image tag usage") if scalar keys %{ $params->[0] } != 1;
         return $self->{caller}->_set_error_message("wrong image tag usage") if not exists $params->[0]->{filename};
-        $self->{printer}->image($params->[0]->{filename});
+        $self->{printer}->image( $params->[0]->{filename} );
         return 1;
     }
 
@@ -255,7 +256,35 @@ sub _image {
     return $self->{caller}->_set_error_message("wrong image tag usage") if %{ $params->[0] };
     return $self->{caller}->_set_error_message("wrong image tag usage") if $params->[1] ne '0';
 
-    $self->{printer}->image($params->[2]);
+    $self->{printer}->image( $params->[2] );
+    return 1;
+}
+
+=head2 _printAreaWidth
+
+Sets the print area width.
+
+=cut
+
+sub _printAreaWidth {
+    my ( $self, $params ) = @_;
+
+    # single tag form <printAreaWidth width="255" />
+    if ( @$params == 1 ) {
+        return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if ref $params->[0] ne 'HASH';
+        return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if scalar keys %{ $params->[0] } != 1;
+        return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if not exists $params->[0]->{width};
+        $self->{printer}->printAreaWidth( $params->[0]->{width} );
+        return 1;
+    }
+
+    # content tag form <printAreaWidth>255</printAreaWidth>
+    return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if @$params != 3;
+    return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if %{ $params->[0] };
+    return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if $params->[1] ne '0';
+
+    $self->{printer}->printAreaWidth( $params->[2] );
     return 1;
 }
 
