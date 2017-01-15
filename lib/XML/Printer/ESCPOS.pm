@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use XML::Parser;
 use XML::Printer::ESCPOS::Tags;
+use XML::Printer::ESCPOS::Debug;
 
 =head1 NAME
 
@@ -50,11 +51,13 @@ our $VERSION = '0.01';
 Constructs a new XML::Printer::ESCPOS object. You must provide a printer object you
 get by C<Printer::ESCPOS->new(...)->printer>.
 
+If you do not set a printer, the module works in debug mode (see below).
+
 =cut
 
 sub new {
     my ( $class, %options ) = @_;
-    return if not exists $options{printer} or not ref $options{printer};
+    $options{printer} ||= XML::Printer::ESCPOS::Debug->new();
     return bless {%options}, $class;
 }
 
@@ -82,7 +85,11 @@ sub parse {
         caller  => $self,
     );
 
-    return $tags->parse( $tree->[1] );
+    my $parsed = $tags->parse( $tree->[1] );
+    if (ref $self->{printer} eq 'XML::Printer::ESCPOS::Debug') {
+        return $self->{printer}->as_perl_code();
+    }
+    return $parsed;
 }
 
 =head2 errormessage
@@ -109,6 +116,67 @@ sub _set_error_message {
     $self->{errormessage} = $message;
     return;
 }
+
+=head1 DEBUG MODE
+
+Sometimes it helps to see what the module would do instead of doing it. That's why I added the debug mode:
+If you do not set a printer object when calling the constructor, an L<XML::Printer::ESCPOS::Debug> object is created.
+It catches all method calls and the parse method returns the perl code that would have been executed if 
+you had set the printer object.
+
+This XML code
+
+    <escpos>
+        <utf8ImagedText
+            fontFamily = "DejaVu Sans"
+            fontStyle  = "Bold"
+            fontSize   = "76"
+            lineHeight = "115"
+            paperWidth = "832">This module</utf8ImagedText>
+        <lf />
+        <utf8ImagedText
+            fontFamily = "DejaVu Sans"
+            fontStyle  = "Bold"
+            fontSize   = "36"
+            lineHeight = "55"
+            paperWidth = "832"
+          >is great for writing templates</utf8ImagedText>
+        <qr>https://github.com/sonntagd/XML-Printer-ESCPOS</qr>
+    </escpos>
+
+will create the following perl code:
+
+    $device->printer->utf8ImagedText(
+      'This module',
+      'fontFamily',
+      'DejaVu Sans',
+      'fontSize',
+      '76',
+      'fontStyle',
+      'Bold',
+      'lineHeight',
+      '115',
+      'paperWidth',
+      '832'
+    );
+    $device->printer->lf();
+    $device->printer->utf8ImagedText(
+      'is great for writing templates',
+      'fontFamily',
+      'DejaVu Sans',
+      'fontSize',
+      '36',
+      'fontStyle',
+      'Bold',
+      'lineHeight',
+      '55',
+      'paperWidth',
+      '832'
+    );
+    $device->printer->qr(
+      'https://github.com/sonntagd/XML-Printer-ESCPOS'
+    );
+
 
 =head1 AUTHOR
 

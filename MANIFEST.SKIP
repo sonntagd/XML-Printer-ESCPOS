@@ -3,4 +3,5 @@
 Dockerfile
 .travis.yml
 xt/boilerplate.t
+XML-Printer-ESCPOS-*
 MANIFEST.SKIP
