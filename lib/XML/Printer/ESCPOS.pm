@@ -74,7 +74,7 @@ sub parse {
     my $xmlparser = XML::Parser->new( Style => 'Tree', );
     my $tree = $xmlparser->parse($xml);
 
-    return _set_error_message('not document found')                                            if !@{$tree};
+    return _set_error_message('no document found')                                             if !@{$tree};
     return _set_error_message('more than one base tag found')                                  if @{$tree} > 2;
     return _set_error_message('document is not an ESCPOS doc (start document with <escpos>!)') if $tree->[0] ne 'escpos';
 
@@ -84,7 +84,7 @@ sub parse {
     );
 
     my $parsed = $tags->parse( $tree->[1] );
-    if (ref $self->{printer} eq 'XML::Printer::ESCPOS::Debug') {
+    if ( ref $self->{printer} eq 'XML::Printer::ESCPOS::Debug' ) {
         return $self->{printer}->as_perl_code();
     }
     return $parsed;
