@@ -42,6 +42,7 @@ sub tag_allowed {
         tab
         upsideDown
         rot90
+        barcode
         /;
 }
 
@@ -217,6 +218,29 @@ sub _qr {
     }
     else {
         $self->{printer}->qr( $params->[2] );
+    }
+    return 1;
+}
+
+=head2 _barcode
+
+Prints a barcode to the printer. See L<Printer::ESCPOS::Manual> for a list of possible options.
+The barcode content should be set as the tag content like <barcode>content</barcode>. All other
+options must be set as attributes.
+
+=cut
+
+sub _barcode {
+    my ( $self, $params ) = @_;
+    return $self->{caller}->_set_error_message("wrong barcode tag usage") if @$params != 3;
+    return $self->{caller}->_set_error_message("wrong barcode tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong barcode tag usage") if $params->[1] != 0;
+    my $options = $params->[0];
+    if (%$options) {
+        $self->{printer}->barcode( barcode => $params->[2], map { $_ => $options->{$_} } sort keys %$options );
+    }
+    else {
+        $self->{printer}->barcode( barcode => $params->[2] );
     }
     return 1;
 }
