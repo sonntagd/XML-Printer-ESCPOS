@@ -39,6 +39,7 @@ sub tag_allowed {
         color
         image
         printAreaWidth
+        tab
         /;
 }
 
@@ -229,6 +230,21 @@ sub _lf {
     return $self->{caller}->_set_error_message("wrong lf tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong lf tag usage") if %{ $params->[0] };
     $self->{printer}->lf();
+    return 1;
+}
+
+=head2 _tab
+
+Moves the cursor to next horizontal tab position.
+
+=cut
+
+sub _tab {
+    my ( $self, $params ) = @_;
+    return $self->{caller}->_set_error_message("wrong tab tag usage") if @$params != 1;
+    return $self->{caller}->_set_error_message("wrong tab tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong tab tag usage") if %{ $params->[0] };
+    $self->{printer}->tab();
     return 1;
 }
 

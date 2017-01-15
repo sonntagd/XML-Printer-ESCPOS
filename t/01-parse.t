@@ -42,6 +42,7 @@ subtest 'Simple parsing' => sub {
                 <bold>This is printed with the second color (if supported)</bold>
               </color>
               <text> with whitespaces </text>
+              <tab /><text>go on</text>
             </escpos>
         #
     );
@@ -75,6 +76,8 @@ subtest 'Simple parsing' => sub {
         [ bold         => 0 ],
         [ color        => 0 ],
         [ text         => ' with whitespaces ' ],
+        ['tab'],
+        [ text => 'go on' ],
         ],
         'XML translated correctly';
 };
@@ -305,7 +308,7 @@ subtest 'printAreaWidth' => sub {
     );
     ok $ret => 'parsing successful';
     is $parser->errormessage(), undef, 'errormessage is empty';
-    is_deeply $mockprinter->{calls}, [ [ printAreaWidth => 501] ], 'XML translated correctly';
+    is_deeply $mockprinter->{calls}, [ [ printAreaWidth => 501 ] ], 'XML translated correctly';
 
     $mockprinter = Mock::Printer::ESCPOS->new();
     $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
