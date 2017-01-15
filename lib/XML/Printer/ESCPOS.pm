@@ -28,12 +28,10 @@ our $VERSION = '0.01';
     use XML::Printer::ESCPOS;
 
     # connect to your printer, see Printer::ESCPOS for more examples
-    my $printer_id = '192.168.0.10';
-    my $port       = '9100';
     my $device = Printer::ESCPOS->new(
         driverType => 'Network',
-        deviceIp   => $printer_ip,
-        devicePort => $port,
+        deviceIp   => '192.168.0.10',
+        devicePort => 9100,
     );
 
     my $parser = XML::Printer::ESCPOS->new(printer => $device->printer);
