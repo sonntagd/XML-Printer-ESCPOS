@@ -28,21 +28,21 @@ sub tag_allowed {
     my ( $self, $method ) = @_;
     return !!grep { $method eq $_ } qw/
         0
-        text
-        bold
-        underline
-        qr
-        utf8ImagedText
-        lf
-        doubleStrike
-        invert
-        color
-        image
-        printAreaWidth
-        tab
-        upsideDown
-        rot90
         barcode
+        bold
+        color
+        doubleStrike
+        image
+        invert
+        lf
+        printAreaWidth
+        qr
+        rot90
+        tab
+        text
+        underline
+        upsideDown
+        utf8ImagedText
         /;
 }
 
@@ -351,5 +351,87 @@ sub _printAreaWidth {
     $self->{printer}->printAreaWidth( $params->[2] );
     return 1;
 }
+
+=head2 _tabPositions
+
+Sets horizontal tab positions for tab stops.
+
+=cut
+
+sub _tabPositions {}
+
+=head2 _font
+
+Choose font a, b or c.
+
+=cut
+
+sub _font {}
+
+=head2 _justify
+
+Set justification to left, right or center.
+
+=cut
+
+sub _justify {}
+
+=head2 _fontHeight
+
+Set font height.
+
+=cut
+
+sub _fontHeight {}
+
+=head2 _fontWidth
+
+Set font width.
+
+=cut
+
+sub _fontWidth {}
+
+=head2 _charSpacing
+
+Set character spacing.
+
+=cut
+
+sub _charSpacing {}
+
+=head2 _lineSpacing
+
+Set line spacing.
+
+=cut
+
+sub _lineSpacing {}
+
+=head2 _selectDefaultLineSpacing
+
+Reverts to default line spacing for the printer.
+
+=cut
+
+sub _selectDefaultLineSpacing {}
+
+=head2 _printPosition
+
+Sets the distance from the beginning of the line to the position at which characters are to be printed.
+
+=cut
+
+sub _printPosition {}
+
+=head2 _leftMargin
+
+Sets the left margin for printing.
+
+=cut
+
+sub _leftMargin {}
+
+
 
 1;

@@ -34,6 +34,10 @@ $parser->parse(q#
 The XML file should be enclosed in `<escpos>` ... `</escpos>` tags.
 
 
+## TODO
+
+See the separate ToDo list [here](TODO.md).
+
 ## INSTALLATION
 
 To install this module, use `cpanm`:
