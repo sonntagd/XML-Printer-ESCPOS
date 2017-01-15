@@ -10,25 +10,25 @@ This module provides a markup language that describes what your ESCPOS printer s
 ## SYNOPSIS
 
 ```perl
-    use Printer::ESCPOS;
-    use XML::Printer::ESCPOS;
+use Printer::ESCPOS;
+use XML::Printer::ESCPOS;
 
-    # connect to your printer, see Printer::ESCPOS for more examples
-    my $printer_id = '192.168.0.10';
-    my $port       = '9100';
-    my $device = Printer::ESCPOS->new(
-        driverType => 'Network',
-        deviceIp   => $printer_ip,
-        devicePort => $port,
-    );
+# connect to your printer, see Printer::ESCPOS for more examples
+my $printer_id = '192.168.0.10';
+my $port       = '9100';
+my $device = Printer::ESCPOS->new(
+    driverType => 'Network',
+    deviceIp   => $printer_ip,
+    devicePort => $port,
+);
 
-    my $parser = XML::Printer::ESCPOS->new(printer => $device->printer);
-    $parser->parse(q#
-    <escpos>
-        <bold>bold text</bold>
-        <underline>underlined text</underline>
-    </escpos>
-    #) or die "Error parsing ESCPOS XML file: ".$parser->errormessage;
+my $parser = XML::Printer::ESCPOS->new(printer => $device->printer);
+$parser->parse(q#
+<escpos>
+    <bold>bold text</bold>
+    <underline>underlined text</underline>
+</escpos>
+#) or die "Error parsing ESCPOS XML file: ".$parser->errormessage;
 ```
 
 ## HOW TO WRITE ESCPOS XML FILES
