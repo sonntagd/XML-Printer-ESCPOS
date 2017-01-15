@@ -40,6 +40,7 @@ sub tag_allowed {
         image
         printAreaWidth
         tab
+        upsideDown
         /;
 }
 
@@ -157,6 +158,17 @@ Sets text to be printed underlined.
 sub _underline {
     my $self = shift;
     return $self->simple_switch( 'underline', @_ );
+}
+
+=head2 _upsideDown
+
+Sets Upside Down Printing.
+
+=cut
+
+sub _upsideDown {
+    my $self = shift;
+    return $self->simple_switch( 'upsideDown', @_ );
 }
 
 =head2 _color
