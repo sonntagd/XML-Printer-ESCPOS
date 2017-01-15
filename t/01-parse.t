@@ -45,6 +45,7 @@ subtest 'Simple parsing' => sub {
               <text> with whitespaces </text>
               <tab /><text>go on</text>
               <upsideDown>some additional text</upsideDown>
+              <rot90>rotated text </rot90>
             </escpos>
         #
     );
@@ -72,7 +73,7 @@ subtest 'Simple parsing' => sub {
         [ text         => 'read this' ],
         [ doubleStrike => 0 ],
         [ bold         => 0 ],
-        [ lf         =>  ],
+        [ lf           => ],
         [ color        => 1 ],
         [ bold         => 1 ],
         [ text         => 'This is printed with the second color (if supported)' ],
@@ -84,6 +85,9 @@ subtest 'Simple parsing' => sub {
         [ upsideDown   => 1 ],
         [ text         => 'some additional text' ],
         [ upsideDown   => 0 ],
+        [ rot90        => 1 ],
+        [ text         => 'rotated text' ],
+        [ rot90        => 0 ],
         ],
         'XML translated correctly';
 };

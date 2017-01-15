@@ -41,6 +41,7 @@ sub tag_allowed {
         printAreaWidth
         tab
         upsideDown
+        rot90
         /;
 }
 
@@ -180,6 +181,17 @@ Use this tag to use the second color (if support by your printer).
 sub _color {
     my $self = shift;
     return $self->simple_switch( 'color', @_ );
+}
+
+=head2 _rot90
+
+Use this tag to use the second color (if support by your printer).
+
+=cut
+
+sub _rot90 {
+    my $self = shift;
+    return $self->simple_switch( 'rot90', @_ );
 }
 
 =head2 _qr
