@@ -80,6 +80,7 @@ sub tag_allowed {
         doubleStrike
         invert
         color
+        image
         /;
 }
 
@@ -227,6 +228,34 @@ sub _lf {
     return $self->{caller}->_set_error_message("wrong lf tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong lf tag usage") if %{ $params->[0] };
     $self->{printer}->lf();
+    return 1;
+}
+
+=head2 _image
+
+Print image from named file.
+
+=cut
+
+sub _image {
+    my ( $self, $params ) = @_;
+
+    # single tag form <image filename="image.jpg" />
+    if (@$params == 1) {
+        return $self->{caller}->_set_error_message("wrong image tag usage") if ref $params->[0] ne 'HASH';
+        return $self->{caller}->_set_error_message("wrong image tag usage") if scalar keys %{ $params->[0] } != 1;
+        return $self->{caller}->_set_error_message("wrong image tag usage") if not exists $params->[0]->{filename};
+        $self->{printer}->image($params->[0]->{filename});
+        return 1;
+    }
+
+    # content tag form <image>image.jpg</image>
+    return $self->{caller}->_set_error_message("wrong image tag usage") if @$params != 3;
+    return $self->{caller}->_set_error_message("wrong image tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong image tag usage") if %{ $params->[0] };
+    return $self->{caller}->_set_error_message("wrong image tag usage") if $params->[1] ne '0';
+
+    $self->{printer}->image($params->[2]);
     return 1;
 }
 
