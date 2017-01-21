@@ -20,6 +20,7 @@ This document tries to summarize what needs to be done to make `XML::Printer::ES
 ## Ideas for convenience functions
 
 * Add number of lines to `<lf />` like `<lf lines="3" />`
+* Automatic word wrap for utf8ImagedText and normal text
 
 ## SUPPORT AND BUGS
 
