@@ -23,6 +23,11 @@ WriteMakefile(
     PREREQ_PM => {
         'XML::Parser' => 0,
     },
+    META_MERGE => {
+        resources => {
+            repository => 'https://github.com/sonntagd/XML-Printer-ESCPOS',
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'XML-Printer-ESCPOS-*' },
 );
