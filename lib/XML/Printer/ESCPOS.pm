@@ -42,6 +42,10 @@ our $VERSION = '0.01';
     </escpos>
     #) or die "Error parsing ESCPOS XML file: ".$parser->errormessage;
 
+    $device->printer->cutPaper();
+    $device->printer->print();
+
+
 =head1 METHODS
 
 =head2 new(printer => $printer)

@@ -27,6 +27,9 @@ $parser->parse(q#
     <underline>underlined text</underline>
 </escpos>
 #) or die "Error parsing ESCPOS XML file: ".$parser->errormessage;
+
+$device->printer->cutPaper();
+$device->printer->print();
 ```
 
 ## HOW TO WRITE ESCPOS XML FILES
