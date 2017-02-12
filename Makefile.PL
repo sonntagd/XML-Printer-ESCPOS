@@ -25,7 +25,14 @@ WriteMakefile(
     },
     META_MERGE => {
         resources => {
-            repository => 'https://github.com/sonntagd/XML-Printer-ESCPOS',
+            repository => {
+                url  => 'https://github.com/sonntagd/XML-Printer-ESCPOS.git',
+                web  => 'https://github.com/sonntagd/XML-Printer-ESCPOS',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://github.com/sonntagd/XML-Printer-ESCPOS/issues',
+            },
         },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
