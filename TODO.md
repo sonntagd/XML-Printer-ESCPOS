@@ -20,7 +20,6 @@ This document tries to summarize what needs to be done to make `XML::Printer::ES
 
 ## Ideas for convenience functions
 
-* Add number of lines to `<lf />` like `<lf lines="3" />`
 * Automatic word wrap for utf8ImagedText and normal text (could be based on [Text::Wrapper](https://metacpan.org/pod/Text::Wrapper), especially for mono-spaced fonts)
 * Add option to send calls to printer object only after the full document was parsed. This would allow to signal illegal document structure before sending anything to the printer object.
 

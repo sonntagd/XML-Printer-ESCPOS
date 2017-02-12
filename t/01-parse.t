@@ -42,6 +42,7 @@ subtest 'Simple parsing' => sub {
               <color>
                 <bold>This is printed with the second color (if supported)</bold>
               </color>
+              <lf lines="3" />
               <text> with whitespaces </text>
               <tab /><text>go on</text>
               <upsideDown>some additional text</upsideDown>
@@ -79,6 +80,9 @@ subtest 'Simple parsing' => sub {
         [ text         => 'This is printed with the second color (if supported)' ],
         [ bold         => 0 ],
         [ color        => 0 ],
+        [ lf           => ],
+        [ lf           => ],
+        [ lf           => ],
         [ text         => ' with whitespaces ' ],
         [ tab          => ],
         [ text         => 'go on' ],
@@ -276,7 +280,7 @@ subtest 'barcodes' => sub {
 
 subtest 'linefeed' => sub {
 
-    plan tests => 5;
+    plan tests => 11;
 
     my $mockprinter = Mock::Printer::ESCPOS->new();
     my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
@@ -306,6 +310,45 @@ subtest 'linefeed' => sub {
     );
     is $ret, undef, 'parsing stopped';
     is $parser->errormessage() => 'wrong lf tag usage', 'correct error message';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+            <escpos>
+              <bold>bold<lf lines="0" /> text</bold>
+            </escpos>
+        #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong lf tag usage: lines attribute must be a positive integer', 'correct error message';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+            <escpos>
+              <bold>bold<lf lines="3.17" /> text</bold>
+            </escpos>
+        #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong lf tag usage: lines attribute must be a positive integer', 'correct error message';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+            <escpos>
+              <bold>bold<lf lines="asd" /> text</bold>
+            </escpos>
+        #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong lf tag usage: lines attribute must be a positive integer', 'correct error message';
 };
 
 subtest 'images' => sub {

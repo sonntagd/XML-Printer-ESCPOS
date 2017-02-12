@@ -268,7 +268,7 @@ sub _utf8ImagedText {
 
 =head2 _lf
 
-Moves to the next line.
+Moves to the next line. If the lines attribute is given, move that number of lines.
 
 =cut
 
@@ -276,9 +276,29 @@ sub _lf {
     my ( $self, $params ) = @_;
     return $self->{caller}->_set_error_message("wrong lf tag usage") if @$params != 1;
     return $self->{caller}->_set_error_message("wrong lf tag usage") if ref $params->[0] ne 'HASH';
-    return $self->{caller}->_set_error_message("wrong lf tag usage") if %{ $params->[0] };
-    $self->{printer}->lf();
+    my $lines = 1;
+    if (%{ $params->[0] }) {
+        my @keys = keys %{ $params->[0] };
+        return $self->{caller}->_set_error_message("wrong lf tag usage") if @keys != 1;
+        return $self->{caller}->_set_error_message("wrong lf tag usage") if $keys[0] ne 'lines';
+        $lines = $params->[0]->{lines};
+        return $self->{caller}->_set_error_message("wrong lf tag usage: lines attribute must be a positive integer") if $lines !~ /^\d+$/ or $lines < 1;
+    }
+    $self->{printer}->lf() for 1..$lines;
     return 1;
+
+#    my ( $self, $params ) = @_;
+#    return $self->{caller}->_set_error_message("wrong QR code tag usage") if @$params != 3;
+#    return $self->{caller}->_set_error_message("wrong QR code tag usage") if ref $params->[0] ne 'HASH';
+#    return $self->{caller}->_set_error_message("wrong QR code tag usage") if $params->[1] != 0;
+#    my $options = $params->[0];
+#    if (%$options) {
+#        $self->{printer}->qr( $params->[2], $options->{ecc} || 'L', $options->{version} || 5, $options->{moduleSize} || 3 );
+#    }
+#    else {
+#        $self->{printer}->qr( $params->[2] );
+#    }
+#    return 1;
 }
 
 =head2 _tab
