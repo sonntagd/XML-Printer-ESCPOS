@@ -286,19 +286,6 @@ sub _lf {
     }
     $self->{printer}->lf() for 1..$lines;
     return 1;
-
-#    my ( $self, $params ) = @_;
-#    return $self->{caller}->_set_error_message("wrong QR code tag usage") if @$params != 3;
-#    return $self->{caller}->_set_error_message("wrong QR code tag usage") if ref $params->[0] ne 'HASH';
-#    return $self->{caller}->_set_error_message("wrong QR code tag usage") if $params->[1] != 0;
-#    my $options = $params->[0];
-#    if (%$options) {
-#        $self->{printer}->qr( $params->[2], $options->{ecc} || 'L', $options->{version} || 5, $options->{moduleSize} || 3 );
-#    }
-#    else {
-#        $self->{printer}->qr( $params->[2] );
-#    }
-#    return 1;
 }
 
 =head2 _tab
