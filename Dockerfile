@@ -8,6 +8,7 @@ RUN cpanm Test::Pod::Coverage
 RUN cpanm Test::Pod
 RUN cpanm DDP
 RUN cpanm Moo
+RUN cpanm Text::Wrapper
 
 RUN mkdir /app
 

@@ -443,4 +443,99 @@ subtest 'printAreaWidth' => sub {
     is $parser->errormessage() => 'wrong printAreaWidth tag usage', 'correct error message';
 };
 
+subtest 'utf8ImagedText word wrap' => sub {
+    plan tests => 9;
+
+    my $mockprinter = Mock::Printer::ESCPOS->new();
+    my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    my $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText wordwrap="10">advanced TeXT</utf8ImagedText>
+        </escpos>
+    #
+    );
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+    is_deeply $mockprinter->{calls}, [ [ utf8ImagedText => 'advanced' ], [ utf8ImagedText => 'TeXT' ], ],
+        'XML translated correctly';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText
+                fontFamily="Rubik"
+                wordwrap="39"
+            >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</utf8ImagedText>
+        </escpos>
+    #
+    );
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+    is_deeply $mockprinter->{calls},
+        [
+        [ utf8ImagedText => 'Lorem ipsum dolor sit amet, consetetur',  'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'sadipscing elitr, sed diam nonumy',       'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'eirmod tempor invidunt ut labore et',     'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'dolore magna aliquyam erat, sed diam',    'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'voluptua. At vero eos et accusam et',     'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'justo duo dolores et ea rebum. Stet',     'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'clita kasd gubergren, no sea takimata',   'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'sanctus est Lorem ipsum dolor sit amet.', 'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'Lorem ipsum dolor sit amet, consetetur',  'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'sadipscing elitr, sed diam nonumy',       'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'eirmod tempor invidunt ut labore et',     'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'dolore magna aliquyam erat, sed diam',    'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'voluptua. At vero eos et accusam et',     'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'justo duo dolores et ea rebum. Stet',     'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'clita kasd gubergren, no sea takimata',   'fontFamily', 'Rubik' ],
+        [ utf8ImagedText => 'sanctus est Lorem ipsum dolor sit amet.', 'fontFamily', 'Rubik' ]
+        ],
+        'XML translated correctly';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText
+                fontFamily="Rubik"
+                fontStyle = "Normal"
+                lineHeight ="40"
+                wordwrap="60"
+                bodystart="   "
+            >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus</utf8ImagedText>
+        </escpos>
+    #
+    );
+
+    use Data::Dumper;
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+    is_deeply $mockprinter->{calls},
+        [
+        [   utf8ImagedText => 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed',
+            'fontFamily', 'Rubik', 'fontStyle', 'Normal', 'lineHeight', '40'
+        ],
+        [   utf8ImagedText => '   diam nonumy eirmod tempor invidunt ut labore et dolore',
+            'fontFamily', 'Rubik', 'fontStyle', 'Normal', 'lineHeight', '40'
+        ],
+        [   utf8ImagedText => '   magna aliquyam erat, sed diam voluptua. At vero eos et',
+            'fontFamily', 'Rubik', 'fontStyle', 'Normal', 'lineHeight', '40'
+        ],
+        [   utf8ImagedText => '   accusam et justo duo dolores et ea rebum. Stet clita kasd',
+            'fontFamily', 'Rubik', 'fontStyle', 'Normal', 'lineHeight', '40'
+        ],
+        [   utf8ImagedText => '   gubergren, no sea takimata sanctus',
+            'fontFamily', 'Rubik', 'fontStyle', 'Normal', 'lineHeight', '40'
+        ],
+        ],
+        'XML translated correctly';
+};
+
 done_testing();

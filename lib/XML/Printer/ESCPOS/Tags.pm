@@ -247,7 +247,12 @@ sub _barcode {
 
 =head2 _utf8ImagedText
 
-Can print text with special styling.
+Can print text with special styling. Use the parameters allowed in L<Printer::ESCPOS>'s method utf8ImagedText 
+as attributes for the I<utf8ImagedText> tag. In addition you can use the attribute I<wordwrap> to set the word
+wrap width. By now, it is only possible to set the maximum number of characters per line. Later we should try 
+to implement a wrapping based in the maximum pixel width of a line.
+When wordwrap is active, you can set the I<bodystart> parameter to define the characters that should be printed
+at the beginning of each line (except the first one). You can use this to set some indentation.
 
 =cut
 
@@ -258,7 +263,18 @@ sub _utf8ImagedText {
     return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if $params->[1] != 0;
     my $options = $params->[0];
     if (%$options) {
-        $self->{printer}->utf8ImagedText( $params->[2], map { $_ => $options->{$_} } sort keys %$options );
+        if (exists $options->{wordwrap}) {
+            my $columns = delete $options->{wordwrap} || 49;
+            my $body_start = exists $options->{bodystart} ? delete $options->{bodystart} : '';
+            require Text::Wrapper;
+            my $wrapper = Text::Wrapper->new(columns => $columns, body_start => $body_start);
+            for my $line (split /\n/ => $wrapper->wrap($params->[2])) {
+                $self->{printer}->utf8ImagedText( $line, map { $_ => $options->{$_} } sort keys %$options );
+            }
+        }
+        else {
+            $self->{printer}->utf8ImagedText( $params->[2], map { $_ => $options->{$_} } sort keys %$options );
+        }
     }
     else {
         $self->{printer}->utf8ImagedText( $params->[2] );
