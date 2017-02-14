@@ -1,5 +1,9 @@
 Revision history for XML-Printer-ESCPOS
 
+0.03    2017-02-15
+		Added automatic word wrapping for simple <text>
+		and for <utf8ImagedText>.
+
 0.02    2017-02-13
         Improved synopsis.
 

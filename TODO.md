@@ -24,7 +24,6 @@ The following methods could be implemented, but are not really content methods:
 
 ## Ideas for convenience functions
 
-* Automatic word wrap for normal text (already available for utf8ImagedText)
 * Add option to send calls to printer object only after the full document was parsed. This would allow to signal illegal document structure before sending anything to the printer object.
 
 ## Documentation

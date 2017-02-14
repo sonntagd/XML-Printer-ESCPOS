@@ -2,8 +2,7 @@ package XML::Printer::ESCPOS::Tags;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.02';
+use Text::Wrapper;
 
 =head2 new
 
@@ -105,7 +104,10 @@ sub _0 {
 
 =head2 _text
 
-Prints plain text.
+Prints plain text. To activate automatic word wrapping, you can use the attribute I<wordwrap> to set the word
+wrap width (use the maximum number of characters per line.
+When wordwrap is active, you can set the I<bodystart> parameter to define the characters that should be printed
+at the beginning of each line (except the first one). You can use this to set some indentation.
 
 =cut
 
@@ -114,7 +116,18 @@ sub _text {
     return $self->{caller}->_set_error_message("wrong text tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong text tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong text tag usage") if $params->[1] != 0;
-    $self->{printer}->text( $params->[2] );
+    my $options = $params->[0];
+    if ( exists $options->{wordwrap} ) {
+        my $columns = delete $options->{wordwrap} || 49;
+        my $body_start = exists $options->{bodystart} ? delete $options->{bodystart} : '';
+        my $wrapper = Text::Wrapper->new( columns => $columns, body_start => $body_start );
+        for my $line ( split /\n/ => $wrapper->wrap( $params->[2] ) ) {
+            $self->{printer}->text($line);
+        }
+    }
+    else {
+        $self->{printer}->text( $params->[2] );
+    }
     return 1;
 }
 
@@ -263,12 +276,11 @@ sub _utf8ImagedText {
     return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if $params->[1] != 0;
     my $options = $params->[0];
     if (%$options) {
-        if (exists $options->{wordwrap}) {
+        if ( exists $options->{wordwrap} ) {
             my $columns = delete $options->{wordwrap} || 49;
             my $body_start = exists $options->{bodystart} ? delete $options->{bodystart} : '';
-            require Text::Wrapper;
-            my $wrapper = Text::Wrapper->new(columns => $columns, body_start => $body_start);
-            for my $line (split /\n/ => $wrapper->wrap($params->[2])) {
+            my $wrapper = Text::Wrapper->new( columns => $columns, body_start => $body_start );
+            for my $line ( split /\n/ => $wrapper->wrap( $params->[2] ) ) {
                 $self->{printer}->utf8ImagedText( $line, map { $_ => $options->{$_} } sort keys %$options );
             }
         }
@@ -293,14 +305,15 @@ sub _lf {
     return $self->{caller}->_set_error_message("wrong lf tag usage") if @$params != 1;
     return $self->{caller}->_set_error_message("wrong lf tag usage") if ref $params->[0] ne 'HASH';
     my $lines = 1;
-    if (%{ $params->[0] }) {
+    if ( %{ $params->[0] } ) {
         my @keys = keys %{ $params->[0] };
         return $self->{caller}->_set_error_message("wrong lf tag usage") if @keys != 1;
         return $self->{caller}->_set_error_message("wrong lf tag usage") if $keys[0] ne 'lines';
         $lines = $params->[0]->{lines};
-        return $self->{caller}->_set_error_message("wrong lf tag usage: lines attribute must be a positive integer") if $lines !~ /^\d+$/ or $lines < 1;
+        return $self->{caller}->_set_error_message("wrong lf tag usage: lines attribute must be a positive integer")
+            if $lines !~ /^\d+$/ or $lines < 1;
     }
-    $self->{printer}->lf() for 1..$lines;
+    $self->{printer}->lf() for 1 .. $lines;
     return 1;
 }
 
@@ -381,7 +394,7 @@ Sets horizontal tab positions for tab stops.
 
 =cut
 
-sub _tabPositions {}
+sub _tabPositions { }
 
 =head2 _font
 
@@ -389,7 +402,7 @@ Choose font a, b or c.
 
 =cut
 
-sub _font {}
+sub _font { }
 
 =head2 _justify
 
@@ -397,7 +410,7 @@ Set justification to left, right or center.
 
 =cut
 
-sub _justify {}
+sub _justify { }
 
 =head2 _fontHeight
 
@@ -405,7 +418,7 @@ Set font height.
 
 =cut
 
-sub _fontHeight {}
+sub _fontHeight { }
 
 =head2 _fontWidth
 
@@ -413,7 +426,7 @@ Set font width.
 
 =cut
 
-sub _fontWidth {}
+sub _fontWidth { }
 
 =head2 _charSpacing
 
@@ -421,7 +434,7 @@ Set character spacing.
 
 =cut
 
-sub _charSpacing {}
+sub _charSpacing { }
 
 =head2 _lineSpacing
 
@@ -429,7 +442,7 @@ Set line spacing.
 
 =cut
 
-sub _lineSpacing {}
+sub _lineSpacing { }
 
 =head2 _selectDefaultLineSpacing
 
@@ -437,7 +450,7 @@ Reverts to default line spacing for the printer.
 
 =cut
 
-sub _selectDefaultLineSpacing {}
+sub _selectDefaultLineSpacing { }
 
 =head2 _printPosition
 
@@ -445,7 +458,7 @@ Sets the distance from the beginning of the line to the position at which charac
 
 =cut
 
-sub _printPosition {}
+sub _printPosition { }
 
 =head2 _leftMargin
 
@@ -453,7 +466,7 @@ Sets the left margin for printing.
 
 =cut
 
-sub _leftMargin {}
+sub _leftMargin { }
 
 =head2 _printNVImage
 
@@ -461,7 +474,7 @@ Prints bit image stored in non-volatile (NV) memory of the printer.
 
 =cut
 
-sub _printNVImage {}
+sub _printNVImage { }
 
 =head2 _printImage
 
@@ -469,8 +482,6 @@ Prints bit image stored in volatile memory of the printer.
 
 =cut
 
-sub _printImage {}
-
-
+sub _printImage { }
 
 1;
