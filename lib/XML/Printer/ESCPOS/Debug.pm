@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+our $VERSION = '0.03';
+
 our $AUTOLOAD;
 
 =head2 new

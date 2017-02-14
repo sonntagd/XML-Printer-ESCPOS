@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Text::Wrapper;
 
+our $VERSION = '0.03';
+
 =head2 new
 
 Constructs a tags object.
