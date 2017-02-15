@@ -770,4 +770,32 @@ subtest 'text word wrap' => sub {
         'correct error message';
 };
 
+subtest 'reset error message on parsing start' => sub {
+    plan tests => 4;
+
+    my $mockprinter = Mock::Printer::ESCPOS->new();
+    my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    my $ret = $parser->parse(
+        q#
+            <escpos>
+              <pold>bold text</pold>
+              <underline>underlined text</underline>
+            </escpos>
+        #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'tag pold is not allowed', 'correct error message';
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <qr>Simple QR code</qr>
+        </escpos>
+    #
+    );
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+};
+
 done_testing();

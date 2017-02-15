@@ -87,6 +87,9 @@ sub parse {
         caller  => $self,
     );
 
+    # reset error message on new parser run
+    delete $self->{errormessage};
+
     my $parsed = $tags->parse( $tree->[1] );
     if ( ref $self->{printer} eq 'XML::Printer::ESCPOS::Debug' ) {
         return $self->{printer}->as_perl_code();
