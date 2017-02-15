@@ -398,6 +398,8 @@ sub _printAreaWidth {
     return 1;
 }
 
+=head1 NOT YET IMPLEMENTED TAGS
+
 =head2 _tabPositions
 
 Sets horizontal tab positions for tab stops.

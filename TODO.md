@@ -24,7 +24,8 @@ The following methods could be implemented, but are not really content methods:
 
 ## Ideas for convenience functions
 
-* Add special tag(s) for creating table-like prints. This could be useful for receipt printing, for example. This could contain automatic word wrapping or automatic cropping of long texts.
+* Add special tag(s) for creating table-like prints. This could be useful for receipt printing, for example. It should contain automatic word wrapping or automatic cropping of long texts.
+* Add horizontal line tag `<hr />`
 * Add option to send calls to printer object only after the full document was parsed. This would allow to signal illegal document structure before sending anything to the printer object.
 
 ## Documentation
