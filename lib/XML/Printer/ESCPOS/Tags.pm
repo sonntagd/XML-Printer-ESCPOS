@@ -385,6 +385,7 @@ sub _printAreaWidth {
         return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if scalar keys %{ $params->[0] } != 1;
         return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if not exists $params->[0]->{width};
         $self->{printer}->printAreaWidth( $params->[0]->{width} );
+        $self->{print_area_width} = $params->[0]->{width};
         return 1;
     }
 
@@ -395,6 +396,7 @@ sub _printAreaWidth {
     return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if $params->[1] ne '0';
 
     $self->{printer}->printAreaWidth( $params->[2] );
+    $self->{print_area_width} = $params->[2];
     return 1;
 }
 
