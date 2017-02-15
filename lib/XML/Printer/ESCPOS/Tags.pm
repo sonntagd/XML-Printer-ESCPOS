@@ -121,6 +121,10 @@ sub _text {
     my $options = $params->[0];
     if ( exists $options->{wordwrap} ) {
         my $columns = delete $options->{wordwrap} || 49;
+        if ($columns !~ /^\d+$/ or $columns < 1) {
+            return $self->{caller}->_set_error_message("wrong text tag usage: wordwrap attribute must be a positive integer");
+        }
+
         my $body_start = exists $options->{bodystart} ? delete $options->{bodystart} : '';
         my $wrapper = Text::Wrapper->new( columns => $columns, body_start => $body_start );
         for my $line ( split /\n/ => $wrapper->wrap( $params->[2] ) ) {
@@ -280,6 +284,10 @@ sub _utf8ImagedText {
     if (%$options) {
         if ( exists $options->{wordwrap} ) {
             my $columns = delete $options->{wordwrap} || 49;
+            if ($columns !~ /^\d+$/ or $columns < 1) {
+                return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage: wordwrap attribute must be a positive integer");
+            }
+
             my $body_start = exists $options->{bodystart} ? delete $options->{bodystart} : '';
             my $wrapper = Text::Wrapper->new( columns => $columns, body_start => $body_start );
             for my $line ( split /\n/ => $wrapper->wrap( $params->[2] ) ) {

@@ -444,7 +444,7 @@ subtest 'printAreaWidth' => sub {
 };
 
 subtest 'utf8ImagedText word wrap' => sub {
-    plan tests => 9;
+    plan tests => 21;
 
     my $mockprinter = Mock::Printer::ESCPOS->new();
     my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
@@ -460,6 +460,113 @@ subtest 'utf8ImagedText word wrap' => sub {
     is $parser->errormessage(), undef, 'errormessage is empty';
     is_deeply $mockprinter->{calls}, [ [ utf8ImagedText => 'advanced' ], [ utf8ImagedText => 'TeXT' ], ],
         'XML translated correctly';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText
+                fontFamily="Rubik"
+                wordwrap="b"
+            >Lorem ipsum dolor sit amet,</utf8ImagedText>
+        </escpos>
+    #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong utf8ImagedText tag usage: wordwrap attribute must be a positive integer',
+        'correct error message';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+
+        q#
+        <escpos>
+            <utf8ImagedText
+                fontFamily="Rubik"
+                wordwrap="13.9"
+            >Lorem ipsum dolor sit amet,</utf8ImagedText>
+        </escpos>
+    #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong utf8ImagedText tag usage: wordwrap attribute must be a positive integer',
+        'correct error message';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText
+                fontFamily="Rubik"
+                wordwrap="0"
+            >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore </utf8ImagedText>
+        </escpos>
+    #
+    );
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+    is_deeply $mockprinter->{calls},
+        [
+        [ 'utf8ImagedText', 'Lorem ipsum dolor sit amet, consetetur sadipscing', 'fontFamily', 'Rubik' ],
+        [ 'utf8ImagedText', 'elitr, sed diam nonumy eirmod tempor invidunt ut',  'fontFamily', 'Rubik' ],
+        [ 'utf8ImagedText', 'labore',                                            'fontFamily', 'Rubik' ]
+        ],
+        'XML translated correctly';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText
+                wordwrap=""
+            >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</utf8ImagedText>
+        </escpos>
+    #
+    );
+    ok $ret => 'parsing successful';
+    is $parser->errormessage(), undef, 'errormessage is empty';
+    is_deeply $mockprinter->{calls},
+        [
+        [ utf8ImagedText => 'Lorem ipsum dolor sit amet, consetetur sadipscing' ],
+        [ utf8ImagedText => 'elitr, sed diam nonumy eirmod tempor invidunt ut' ],
+        [ utf8ImagedText => 'labore et dolore magna aliquyam erat, sed diam' ],
+        [ utf8ImagedText => 'voluptua. At vero eos et accusam et justo duo' ],
+        [ utf8ImagedText => 'dolores et ea rebum. Stet clita kasd gubergren,' ],
+        [ utf8ImagedText => 'no sea takimata sanctus est Lorem ipsum dolor sit' ],
+        [ utf8ImagedText => 'amet. Lorem ipsum dolor sit amet, consetetur' ],
+        [ utf8ImagedText => 'sadipscing elitr, sed diam nonumy eirmod tempor' ],
+        [ utf8ImagedText => 'invidunt ut labore et dolore magna aliquyam erat,' ],
+        [ utf8ImagedText => 'sed diam voluptua. At vero eos et accusam et' ],
+        [ utf8ImagedText => 'justo duo dolores et ea rebum. Stet clita kasd' ],
+        [ utf8ImagedText => 'gubergren, no sea takimata sanctus est Lorem' ],
+        [ utf8ImagedText => 'ipsum dolor sit amet.' ]
+        ],
+        'XML translated correctly';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <utf8ImagedText
+                fontFamily="Rubik"
+                wordwrap="00"
+            >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</utf8ImagedText>
+        </escpos>
+    #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong utf8ImagedText tag usage: wordwrap attribute must be a positive integer',
+        'correct error message';
 
     $mockprinter = Mock::Printer::ESCPOS->new();
     $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
@@ -537,7 +644,7 @@ subtest 'utf8ImagedText word wrap' => sub {
 };
 
 subtest 'text word wrap' => sub {
-    plan tests => 9;
+    plan tests => 15;
 
     my $mockprinter = Mock::Printer::ESCPOS->new();
     my $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
@@ -611,6 +718,56 @@ subtest 'text word wrap' => sub {
         [ text => '   gubergren, no sea takimata sanctus' ],
         ],
         'XML translated correctly';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <text
+                wordwrap="cx"
+                bodystart="   "
+            >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus</text>
+        </escpos>
+    #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong text tag usage: wordwrap attribute must be a positive integer',
+        'correct error message';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <text
+                wordwrap="37.9"
+                bodystart="   "
+            >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus</text>
+        </escpos>
+    #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong text tag usage: wordwrap attribute must be a positive integer',
+        'correct error message';
+
+    $mockprinter = Mock::Printer::ESCPOS->new();
+    $parser = XML::Printer::ESCPOS->new( printer => $mockprinter );
+
+    $ret = $parser->parse(
+        q#
+        <escpos>
+            <text
+                wordwrap="00"
+            >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus</text>
+        </escpos>
+    #
+    );
+    is $ret, undef, 'parsing stopped';
+    is $parser->errormessage() => 'wrong text tag usage: wordwrap attribute must be a positive integer',
+        'correct error message';
 };
 
 done_testing();
