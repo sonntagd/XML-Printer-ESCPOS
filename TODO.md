@@ -4,7 +4,6 @@ This document tries to summarize what needs to be done to make `XML::Printer::ES
 
 ## Implement Printer::ESCPOS methods
 
-* tabPositions
 * font
 * justify
 * fontHeight
