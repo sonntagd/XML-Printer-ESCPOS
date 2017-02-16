@@ -40,6 +40,7 @@ sub tag_allowed {
         qr
         rot90
         tab
+        tabpositions
         text
         underline
         upsideDown
@@ -121,7 +122,7 @@ sub _text {
     my $options = $params->[0];
     if ( exists $options->{wordwrap} ) {
         my $columns = delete $options->{wordwrap} || 49;
-        if ($columns !~ /^\d+$/ or $columns < 1) {
+        if ( $columns !~ /^\d+$/ or $columns < 1 ) {
             return $self->{caller}->_set_error_message("wrong text tag usage: wordwrap attribute must be a positive integer");
         }
 
@@ -284,8 +285,9 @@ sub _utf8ImagedText {
     if (%$options) {
         if ( exists $options->{wordwrap} ) {
             my $columns = delete $options->{wordwrap} || 49;
-            if ($columns !~ /^\d+$/ or $columns < 1) {
-                return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage: wordwrap attribute must be a positive integer");
+            if ( $columns !~ /^\d+$/ or $columns < 1 ) {
+                return $self->{caller}
+                    ->_set_error_message("wrong utf8ImagedText tag usage: wordwrap attribute must be a positive integer");
             }
 
             my $body_start = exists $options->{bodystart} ? delete $options->{bodystart} : '';
@@ -402,13 +404,58 @@ sub _printAreaWidth {
 
 =head1 NOT YET IMPLEMENTED TAGS
 
-=head2 _tabPositions
+=head2 _tabpositions
 
-Sets horizontal tab positions for tab stops.
+Sets horizontal tab positions for tab stops. Syntax for XML is the following:
+
+    <tabpositions>
+      <tabposition>5</tabposition>
+      <tabposition>9</tabposition>
+      <tabposition>13</tabposition>
+    </tabpositions>
 
 =cut
 
-sub _tabPositions { }
+sub _tabpositions {
+    my ( $self, $tags ) = @_;
+
+    my @elements = @$tags;
+    my $hashref  = shift @elements;
+    if ( ref $hashref ne 'HASH' or %$hashref ) {
+        return $self->{caller}->_set_error_message('first element should be an empty hashref ({})');
+    }
+
+    my @tabpositions = ();
+    while (@elements) {
+        my $tag  = shift @elements;
+        my $data = shift @elements;
+        next if $tag eq '0' and $data =~ /^\s*$/;
+
+        if ( $tag ne 'tabposition' ) {
+            return $self->{caller}
+                ->_set_error_message("wrong tabpositions tag usage: must not contain anything else than tabposition tags");
+        }
+        if (   ref $data ne 'ARRAY'
+            or ref $data->[0] ne 'HASH'
+            or keys %{ $data->[0] }
+            or $data->[1] ne '0'
+            or $data->[2] !~ /^\d+$/
+            or $data->[2] < 1
+            or @$data != 3 )
+        {
+            return $self->{caller}->_set_error_message("wrong tabposition tag usage: value must be a positive integer");
+        }
+        push @tabpositions, $data->[2];
+    }
+
+    if ( !@tabpositions ) {
+        return $self->{caller}
+            ->_set_error_message("wrong tabpositions tag usage: must contain at least one tabposition tag as child");
+    }
+
+    $self->{printer}->tabPositions(@tabpositions);
+    return 1;
+}
 
 =head2 _font
 
