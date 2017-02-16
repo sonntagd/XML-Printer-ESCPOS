@@ -353,12 +353,14 @@ Print image from named file.
 sub _image {
     my ( $self, $params ) = @_;
 
+    my $filename;
+
     # single tag form <image filename="image.jpg" />
     if ( @$params == 1 ) {
         return $self->{caller}->_set_error_message("wrong image tag usage") if ref $params->[0] ne 'HASH';
         return $self->{caller}->_set_error_message("wrong image tag usage") if scalar keys %{ $params->[0] } != 1;
         return $self->{caller}->_set_error_message("wrong image tag usage") if not exists $params->[0]->{filename};
-        $self->{printer}->image( $params->[0]->{filename} );
+        $filename = $params->[0]->{filename};
         return 1;
     }
 
@@ -367,8 +369,12 @@ sub _image {
     return $self->{caller}->_set_error_message("wrong image tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong image tag usage") if %{ $params->[0] };
     return $self->{caller}->_set_error_message("wrong image tag usage") if $params->[1] ne '0';
+    $filename = $params->[2];
 
-    $self->{printer}->image( $params->[2] );
+    return $self->{caller}->_set_error_message("wrong image tag usage: file does not exist") if !-f $filename;
+
+    $self->{printer}->image( GD::Image->newFromPng($filename) );
+
     return 1;
 }
 
