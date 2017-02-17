@@ -3,6 +3,8 @@ package XML::Printer::ESCPOS::Tags;
 use strict;
 use warnings;
 use Text::Wrapper;
+use GD;
+
 
 our $VERSION = '0.04';
 
@@ -373,7 +375,11 @@ sub _image {
 
     return $self->{caller}->_set_error_message("wrong image tag usage: file does not exist") if !-f $filename;
 
-    $self->{printer}->image( GD::Image->newFromPng($filename) );
+    my $image = GD::Image->newFromPng($filename) or return $self->{caller}->_set_error_message("Error loading image file $filename");
+
+    $self->{printer}->print();
+    $self->{printer}->image( $image );
+    $self->{printer}->print();
 
     return 1;
 }
