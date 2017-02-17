@@ -26,13 +26,14 @@ The following methods could be implemented, but are not really content methods:
 * Add special tag(s) for creating table-like prints. This could be useful for receipt printing, for example. It should contain automatic word wrapping or automatic cropping of long texts.
 * Add horizontal line tag `<hr />`
 * Add option to send calls to printer object only after the full document was parsed. This would allow to signal illegal document structure before sending anything to the printer object.
+* Set global values for `<utf8ImagedText>` attributes. This way we could omit setting the font for every line.
 
 ## Fix improvable implementations
 
 ### image
 
 * The `<image>` tag currently only works with PNG files. This should be replaced by a function that checks for file extension to select import method. JPEG and GIF should be possible in addition to PNG.
-* The `<image>` tag function contains a hacky workaround for problems with my printer: We send `->print()` before and after `->image()` to the printer object. In plain Printer::ESCPOS code this is not necessary.
+* The `<image>` tag function contains a hacky workaround for problems with my printer: We send `->print()` before and after `->image()` to the printer object. In plain Printer::ESCPOS code this is not necessary. If it is not fixable, it maybe should be configurable by an `<image>` tag attribute.
 * Write good tests for image tag.
 
 ## Documentation
