@@ -40,6 +40,7 @@ sub tag_allowed {
         lf
         printAreaWidth
         qr
+        repeat
         rot90
         tab
         tabpositions
@@ -466,6 +467,32 @@ sub _tabpositions {
     }
 
     $self->{printer}->tabPositions(@tabpositions);
+    return 1;
+}
+
+=head2 _repeat
+
+Moves to the next line. If the lines attribute is given, move that number of lines.
+
+=cut
+
+sub _repeat {
+    my ( $self, $params ) = @_;
+    return $self->{caller}->_set_error_message("wrong repeat tag usage") if ref $params ne 'ARRAY';
+    return $self->{caller}->_set_error_message("wrong repeat tag usage") if !@$params;
+    return $self->{caller}->_set_error_message("wrong repeat tag usage") if ref $params->[0] ne 'HASH';
+
+    my $times = 1;
+    my $options = $params->[0];
+    if ( exists $options->{times} ) {
+        $times = $options->{times};
+        return $self->{caller}->_set_error_message("wrong repeat tag usage: only positive integers are allowed") if $times =~ /\D/ or $times < 1;
+    }
+
+    for ( 1 .. $times ) {
+        $self->parse( [ {}, @$params[ 1.. $#$params ] ] ) or return;
+    }
+
     return 1;
 }
 

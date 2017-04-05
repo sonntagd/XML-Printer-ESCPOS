@@ -25,8 +25,6 @@ The following methods could be implemented, but are not really content methods:
 
 * Add special tag(s) for creating table-like prints. This could be useful for receipt printing, for example. It should contain automatic word wrapping or automatic cropping of long texts.
 * Add horizontal line tag `<hr />`
-* Add option to send calls to printer object only after the full document was parsed. This would allow to signal illegal document structure before sending anything to the printer object.
-* Add repeat tag: `<underline><repeat times="69"><text> </text></repeat></underline>` would print a horizontal line. The repeat tag could contain everything and would parse the content n times.
 * Set global values for `<utf8ImagedText>` attributes. This way we could omit setting the font for every line.
 
 ## Fix improvable implementations
@@ -39,7 +37,7 @@ The following methods could be implemented, but are not really content methods:
 
 ## Documentation
 
-Add documentation describing the XML structure to use. By now you can find examples in the test suite, especially in the file `t/01-parse.t`.
+Add documentation describing the XML structure to use. By now you can find examples in the test suite.
 
 ## SUPPORT AND BUGS
 

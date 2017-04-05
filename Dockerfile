@@ -10,6 +10,9 @@ RUN cpanm DDP
 RUN cpanm Moo
 RUN cpanm Text::Wrapper
 
+RUN apt-get update && apt-get install -y libgd-dev
+RUN cpanm GD
+
 RUN mkdir /app
 
 WORKDIR /app

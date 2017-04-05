@@ -1,12 +1,14 @@
 Revision history for XML-Printer-ESCPOS
 
+0.05    2017-04-05
+    - Added repeat tag.
+
 0.03    2017-02-15
-		Added automatic word wrapping for simple <text>
-		and for <utf8ImagedText>.
+    - Added automatic word wrapping for simple <text> and for <utf8ImagedText>.
 
 0.02    2017-02-13
-        Improved synopsis.
+    - Improved synopsis.
 
 0.01    2017-02-12
-        First version, released on an unsuspecting world.
+    - First version, released on an unsuspecting world.
 
