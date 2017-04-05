@@ -379,7 +379,7 @@ sub _image {
     my $image = GD::Image->newFromPng($filename) or return $self->{caller}->_set_error_message("Error loading image file $filename");
 
     $self->{printer}->print();
-    $self->{printer}->image( $image );
+   $self->{printer}->image( $image );
     $self->{printer}->print();
 
     return 1;
@@ -472,7 +472,11 @@ sub _tabpositions {
 
 =head2 _repeat
 
-Moves to the next line. If the lines attribute is given, move that number of lines.
+Repeats the content I<n> times. Syntax:
+
+    <repeat times="3">
+        [tags to repeat]
+    </repeat>
 
 =cut
 
