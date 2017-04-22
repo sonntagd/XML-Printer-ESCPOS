@@ -20,6 +20,7 @@ t/10-text-word-wrap.t
 t/11-reset-error-message.t
 t/12-tab-positions.t
 t/13-repeat.t
+t/14-set-unset.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

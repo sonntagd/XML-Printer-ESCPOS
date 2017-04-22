@@ -39,6 +39,8 @@ sub tag_allowed {
         invert
         lf
         printAreaWidth
+        set
+        unset
         qr
         repeat
         rot90
@@ -94,6 +96,21 @@ sub simple_switch {
     return 1;
 }
 
+=head2 include_global_options
+
+Helper method to add global options to object options.
+
+=cut
+
+sub include_global_options {
+    my ($self, $options) = @_;
+
+    return {
+        %{ $self->{global_options} // {} },
+        %$options,
+    };
+}
+
 =head2 _0
 
 Prints plain text and strips out leading and trailing whitespaces.
@@ -122,7 +139,7 @@ sub _text {
     return $self->{caller}->_set_error_message("wrong text tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong text tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong text tag usage") if $params->[1] != 0;
-    my $options = $params->[0];
+    my $options = $self->include_global_options($params->[0]);
     if ( exists $options->{wordwrap} ) {
         my $columns = delete $options->{wordwrap} || 49;
         if ( $columns !~ /^\d+$/ or $columns < 1 ) {
@@ -235,7 +252,7 @@ sub _qr {
     return $self->{caller}->_set_error_message("wrong QR code tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong QR code tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong QR code tag usage") if $params->[1] != 0;
-    my $options = $params->[0];
+    my $options = $self->include_global_options($params->[0]);
     if (%$options) {
         $self->{printer}->qr( $params->[2], $options->{ecc} || 'L', $options->{version} || 5, $options->{moduleSize} || 3 );
     }
@@ -258,7 +275,7 @@ sub _barcode {
     return $self->{caller}->_set_error_message("wrong barcode tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong barcode tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong barcode tag usage") if $params->[1] != 0;
-    my $options = $params->[0];
+    my $options = $self->include_global_options($params->[0]);
     if (%$options) {
         $self->{printer}->barcode( barcode => $params->[2], map { $_ => $options->{$_} } sort keys %$options );
     }
@@ -284,7 +301,7 @@ sub _utf8ImagedText {
     return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if $params->[1] != 0;
-    my $options = $params->[0];
+    my $options = $self->include_global_options($params->[0]);
     if (%$options) {
         if ( exists $options->{wordwrap} ) {
             my $columns = delete $options->{wordwrap} || 49;
@@ -379,7 +396,7 @@ sub _image {
     my $image = GD::Image->newFromPng($filename) or return $self->{caller}->_set_error_message("Error loading image file $filename");
 
     $self->{printer}->print();
-   $self->{printer}->image( $image );
+    $self->{printer}->image( $image );
     $self->{printer}->print();
 
     return 1;
@@ -400,7 +417,7 @@ sub _printAreaWidth {
         return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if scalar keys %{ $params->[0] } != 1;
         return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if not exists $params->[0]->{width};
         $self->{printer}->printAreaWidth( $params->[0]->{width} );
-        $self->{print_area_width} = $params->[0]->{width};
+        $self->{global_options}->{printAreaWidth} = $params->[0]->{width};
         return 1;
     }
 
@@ -411,7 +428,49 @@ sub _printAreaWidth {
     return $self->{caller}->_set_error_message("wrong printAreaWidth tag usage") if $params->[1] ne '0';
 
     $self->{printer}->printAreaWidth( $params->[2] );
-    $self->{print_area_width} = $params->[2];
+    $self->{global_options}->{printAreaWidth} = $params->[2];
+    return 1;
+}
+
+=head2 _set
+
+Sets global variables: paperWidth, wordwrap, fontFamily, fontSize, fontStyle, lineHeight, printAreaWidth
+
+=cut
+
+sub _set {
+    my ( $self, $params ) = @_;
+
+    return $self->{caller}->_set_error_message("wrong set tag usage") if @$params != 1 ;
+    return $self->{caller}->_set_error_message("wrong set tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong set tag usage") if not scalar keys %{ $params->[0] };
+
+    $self->{global_options} ||= {};
+    for my $var (qw/paperWidth wordwrap fontFamily fontSize fontStyle lineHeight printAreaWidth/) {
+        $self->{global_options}->{$var} = $params->[0]->{$var} if $params->[0]->{$var};
+    }
+    
+    return 1;
+}
+
+=head2 _unset
+
+Resets global variables to standard values: paperWidth, wordwrap, fontFamily, fontSize, fontStyle, lineHeight, printAreaWidth
+Syntax: <unset fontStyle="" />
+
+=cut
+
+sub _unset {
+    my ( $self, $params ) = @_;
+
+    return $self->{caller}->_set_error_message("wrong unset tag usage") if @$params != 1 ;
+    return $self->{caller}->_set_error_message("wrong unset tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong unset tag usage") if not scalar keys %{ $params->[0] };
+
+    for my $var (keys %{ $params->[0] }) {
+        delete $self->{global_options}->{$var};
+    }
+    
     return 1;
 }
 
