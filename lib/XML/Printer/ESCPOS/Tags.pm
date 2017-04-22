@@ -50,6 +50,7 @@ sub tag_allowed {
         underline
         upsideDown
         utf8ImagedText
+        justify
         /;
 }
 
@@ -121,7 +122,10 @@ sub _0 {
     my ( $self, $text ) = @_;
     $text =~ s/^\s+//gm;
     $text =~ s/\s+$//gm;
-    $self->{printer}->text($text) if $text =~ /\S/;
+    if ($text =~ /\S/) {
+        $self->{printer}->justify( $self->{justify_state} ) if $self->{justify_state};
+        $self->{printer}->text($text);
+    }
     return 1;
 }
 
@@ -149,10 +153,12 @@ sub _text {
         my $body_start = exists $options->{bodystart} ? delete $options->{bodystart} : '';
         my $wrapper = Text::Wrapper->new( columns => $columns, body_start => $body_start );
         for my $line ( split /\n/ => $wrapper->wrap( $params->[2] ) ) {
+            $self->{printer}->justify( $self->{justify_state} ) if $self->{justify_state};
             $self->{printer}->text($line);
         }
     }
     else {
+        $self->{printer}->justify( $self->{justify_state} ) if $self->{justify_state};
         $self->{printer}->text( $params->[2] );
     }
     return 1;
@@ -474,8 +480,6 @@ sub _unset {
     return 1;
 }
 
-=head1 NOT YET IMPLEMENTED TAGS
-
 =head2 _tabpositions
 
 Sets horizontal tab positions for tab stops. Syntax for XML is the following:
@@ -559,6 +563,36 @@ sub _repeat {
     return 1;
 }
 
+=head2 _justify
+
+Set justification to left, right or center. Syntax for XML is the following:
+<justify align="right">text</justify>
+
+=cut
+
+sub _justify {
+    my ( $self, $params ) = @_;
+
+    return $self->{caller}->_set_error_message("wrong justify tag usage") if @$params < 3;
+    return $self->{caller}->_set_error_message("wrong justify tag usage") if ref $params->[0] ne 'HASH';
+    return $self->{caller}->_set_error_message("wrong justify tag usage") if !$params->[0]->{align};
+    return $self->{caller}->_set_error_message("wrong justify tag usage") if keys %{ $params->[0] } != 1;
+    return $self->{caller}->_set_error_message("wrong justify tag usage") if not grep { $params->[0]->{align} eq $_ } qw/left center right/;
+
+    $self->{justify_state} ||= 'left';
+
+    my $justify_state_before = $self->{justify_state};
+    $self->{justify_state} = $params->[0]->{align};
+
+    $params->[0] = {};
+    $self->parse($params) or return;
+
+    $self->{justify_state} = $justify_state_before;
+    return 1;
+}
+
+=head1 NOT YET IMPLEMENTED TAGS
+
 =head2 _font
 
 Choose font a, b or c.
@@ -566,14 +600,6 @@ Choose font a, b or c.
 =cut
 
 sub _font { }
-
-=head2 _justify
-
-Set justification to left, right or center.
-
-=cut
-
-sub _justify { }
 
 =head2 _fontHeight
 
