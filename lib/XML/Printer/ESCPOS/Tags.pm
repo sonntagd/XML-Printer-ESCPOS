@@ -6,7 +6,7 @@ use Text::Wrapper;
 use GD;
 
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head2 new
 
@@ -51,6 +51,7 @@ sub tag_allowed {
         upsideDown
         utf8ImagedText
         justify
+        hr
         /;
 }
 
@@ -387,24 +388,33 @@ sub _image {
         return $self->{caller}->_set_error_message("wrong image tag usage") if scalar keys %{ $params->[0] } != 1;
         return $self->{caller}->_set_error_message("wrong image tag usage") if not exists $params->[0]->{filename};
         $filename = $params->[0]->{filename};
-        return 1;
     }
-
-    # content tag form <image>image.jpg</image>
-    return $self->{caller}->_set_error_message("wrong image tag usage") if @$params != 3;
-    return $self->{caller}->_set_error_message("wrong image tag usage") if ref $params->[0] ne 'HASH';
-    return $self->{caller}->_set_error_message("wrong image tag usage") if %{ $params->[0] };
-    return $self->{caller}->_set_error_message("wrong image tag usage") if $params->[1] ne '0';
-    $filename = $params->[2];
+    else {
+        # content tag form <image>image.jpg</image>
+        return $self->{caller}->_set_error_message("wrong image tag usage") if @$params != 3;
+        return $self->{caller}->_set_error_message("wrong image tag usage") if ref $params->[0] ne 'HASH';
+        return $self->{caller}->_set_error_message("wrong image tag usage") if %{ $params->[0] };
+        return $self->{caller}->_set_error_message("wrong image tag usage") if $params->[1] ne '0';
+        $filename = $params->[2];
+    }
 
     return $self->{caller}->_set_error_message("wrong image tag usage: file does not exist") if !-f $filename;
 
-    my $image = GD::Image->newFromPng($filename) or return $self->{caller}->_set_error_message("Error loading image file $filename");
+    my $image;
+    if ($filename =~ m/\.png$/) {
+        $image = GD::Image->newFromPng($filename) or return $self->{caller}->_set_error_message("Error loading image file $filename");
+    }
+    elsif ($filename =~ m/\.gif$/) {
+        $image = GD::Image->newFromGif($filename) or return $self->{caller}->_set_error_message("Error loading image file $filename");
+    }
+    elsif ($filename =~ m/\.jpe?g$/) {
+        $image = GD::Image->newFromJpeg($filename) or return $self->{caller}->_set_error_message("Error loading image file $filename");
+    }
+    else {
+        return $self->{caller}->_set_error_message("wrong image tag usage: file format not supported");
+    }
 
-    $self->{printer}->print();
     $self->{printer}->image( $image );
-    $self->{printer}->print();
-
     return 1;
 }
 
@@ -477,6 +487,39 @@ sub _unset {
         delete $self->{global_options}->{$var};
     }
     
+    return 1;
+}
+
+=head2 _hr
+
+Adds a horizontal line. Use the I<thickness> attribute to set the line's thickness. Defaults to 2.
+
+=cut
+
+sub _hr {
+    my ( $self, $params ) = @_;
+    return $self->{caller}->_set_error_message("wrong hr tag usage") if @$params != 1;
+    return $self->{caller}->_set_error_message("wrong hr tag usage") if ref $params->[0] ne 'HASH';
+    my $thickness = 2;
+    if ( %{ $params->[0] } ) {
+        my @keys = keys %{ $params->[0] };
+        return $self->{caller}->_set_error_message("wrong hr tag usage") if !@keys;
+        $thickness = $params->[0]->{thickness};
+        return $self->{caller}->_set_error_message("wrong hr tag usage") if !$thickness;
+        return $self->{caller}->_set_error_message("wrong hr tag usage: thickness attribute must be a positive integer")
+            if $thickness !~ /^\d+$/ or $thickness < 1;
+    }
+
+    my $width = $params->[0]->{width} || $self->{paperWidth} || $self->{print_area_width} || 512;
+    my $img = GD::Image->new( $width, $thickness );
+    my $black = $img->colorAllocate( 0, 0, 0 );
+
+    for my $line ( 1 .. $thickness ) {
+        $img->line( 0, $line, $width, $line, $black );
+    }
+
+    $self->{printer}->image($img);
+
     return 1;
 }
 

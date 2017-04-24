@@ -22,7 +22,12 @@ t/12-tab-positions.t
 t/13-repeat.t
 t/14-set-unset.t
 t/15-justify.t
+t/16-hr.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/lib/Mock/Printer/ESCPOS.pm
+t/images/arrow.png
+t/images/arrow.pdf
+t/images/arrow.gif
+t/images/arrow.jpg

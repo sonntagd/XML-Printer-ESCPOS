@@ -20,7 +20,7 @@ template engine of your choice.
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
