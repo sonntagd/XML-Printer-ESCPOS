@@ -21,11 +21,6 @@ The following methods could be implemented, but are not really content methods:
 * cutPaper
 * print
 
-## Ideas for convenience functions
-
-* Add horizontal line tag `<hr />`
-* Set global values for `<utf8ImagedText>` attributes. This way we could omit setting the font for every line.
-
 ## Fix improvable implementations
 
 ### image
