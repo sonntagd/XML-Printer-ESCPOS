@@ -510,7 +510,7 @@ sub _hr {
             if $thickness !~ /^\d+$/ or $thickness < 1;
     }
 
-    my $width = $params->[0]->{width} || $self->{paperWidth} || $self->{print_area_width} || 512;
+    my $width = $params->[0]->{width} || $self->{global_options}->{paperWidth} || $self->{global_options}->{printAreaWidth} || 512;
     my $img = GD::Image->new( $width, $thickness );
     my $black = $img->colorAllocate( 0, 0, 0 );
 
