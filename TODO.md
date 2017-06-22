@@ -23,7 +23,6 @@ The following methods could be implemented, but are not really content methods:
 
 ## Ideas for convenience functions
 
-* Add special tag(s) for creating table-like prints. This could be useful for receipt printing, for example. It should contain automatic word wrapping or automatic cropping of long texts.
 * Add horizontal line tag `<hr />`
 * Set global values for `<utf8ImagedText>` attributes. This way we could omit setting the font for every line.
 
