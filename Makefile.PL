@@ -21,9 +21,11 @@ WriteMakefile(
         'Test::Pod'           => 0,
     },
     PREREQ_PM => {
-        'XML::Parser'   => 0,
-        'Text::Wrapper' => 0,
-        'GD'            => 0,
+        'XML::Parser'       => 0,
+        'Text::Wrapper'     => 0,
+        'GD'                => 0,
+        'List::MoreUtils'   => 0,
+        'Array::Utils'      => 0,        
     },
     META_MERGE => {
         resources => {
